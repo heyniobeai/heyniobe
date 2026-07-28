@@ -122,7 +122,7 @@ input[type=email]:focus{outline:none;border-color:var(--gold-dim);box-shadow:0 0
 <script>
 const SUPA_URL = "https://gcryyyfepikdkjkgshcl.supabase.co";
 const SUPA_KEY = "sb_publishable_iasBF-GV38T2STJJYiwAVg_ia8EMRMr";
-const REDIRECT = location.origin + "/";
+const REDIRECT = location.origin + "/app";
 
 /* theme */
 const root=document.documentElement, tt=document.getElementById('tt');
@@ -164,7 +164,7 @@ ef.onsubmit=async(e)=>{
 /* already signed in? */
 (function(){
   const h=new URLSearchParams(location.hash.slice(1));
-  if(h.get('access_token')) say('Signed in. Redirecting…','ok'), setTimeout(()=>location.href='/',900);
+  if(h.get('access_token')) say('Signed in. Redirecting…','ok'), setTimeout(()=>location.href='/app',900);
   const err=h.get('error_description'); if(err) say(decodeURIComponent(err).slice(0,160),'err');
 })();
 

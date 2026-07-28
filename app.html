@@ -1,0 +1,297 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>NIOBE</title>
+<style>
+:root{
+  --bg:#111319; --surface:#1b1f28; --raise:#2a2f3b;
+  --gold:#EBC77C; --gold-br:#FBE3A8; --gold-dim:#b08e4e;
+  --ice:#BCD3E4; --ink:#F8F4EC; --ink-soft:#DDD5C4; --mut:#ABA593;
+  --line:rgba(216,184,120,.16); --radius:14px;
+  --serif:'Iowan Old Style','Palatino Linotype',Georgia,'Times New Roman',serif;
+  --mono:ui-monospace,'SF Mono','IBM Plex Mono',Menlo,Consolas,monospace;
+}
+:root[data-theme="light"]{
+  --bg:#f4f1e8; --surface:#fffdf7; --raise:#fbf7ec;
+  --gold:#9a7327; --gold-br:#7c5c1c; --gold-dim:#b79b63;
+  --ice:#41627e; --ink:#1d1a14; --ink-soft:#3b352a; --mut:#6b6152;
+  --line:rgba(120,95,40,.2);
+}
+@media(prefers-color-scheme:light){:root:not([data-theme="dark"]){
+  --bg:#f4f1e8; --surface:#fffdf7; --raise:#fbf7ec; --gold:#9a7327; --gold-br:#7c5c1c;
+  --gold-dim:#b79b63; --ice:#41627e; --ink:#1d1a14; --ink-soft:#3b352a; --mut:#6b6152;
+  --line:rgba(120,95,40,.2);}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--serif);
+     -webkit-font-smoothing:antialiased;min-height:100vh}
+.hidden{display:none!important}
+/* top bar */
+.bar{display:flex;align-items:center;justify-content:space-between;padding:16px 22px;
+     border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--bg);z-index:5}
+.brand{display:flex;gap:.14em}
+.brand span{font-size:16px;letter-spacing:.18em;font-weight:600;color:var(--gold)}
+.bar-r{display:flex;align-items:center;gap:10px}
+.who{font-family:var(--mono);font-size:11px;color:var(--mut);letter-spacing:.06em}
+.ghost{background:none;border:1px solid var(--line);color:var(--mut);border-radius:8px;
+       padding:6px 10px;cursor:pointer;font:inherit;font-size:12px}
+.ghost:hover{border-color:var(--gold-dim);color:var(--ink)}
+/* progress rail */
+.rail{height:2px;background:var(--raise);position:sticky;top:57px;z-index:5}
+.rail i{display:block;height:100%;background:linear-gradient(90deg,var(--gold-dim),var(--gold-br));
+        width:0;transition:width .45s cubic-bezier(.2,.7,.2,1)}
+main{max-width:720px;margin:0 auto;padding:44px 22px 90px}
+/* states */
+h1{font-size:clamp(26px,4.4vw,38px);line-height:1.18;margin:0 0 14px;text-wrap:balance}
+p.lede{color:var(--ink-soft);font-size:17px;line-height:1.62;margin:0 0 22px}
+.meta{font-family:var(--mono);font-size:10.5px;letter-spacing:.19em;text-transform:uppercase;
+      color:var(--mut);margin:0 0 10px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+      padding:28px 26px;box-shadow:0 24px 60px -34px rgba(0,0,0,.6)}
+.q{font-size:clamp(19px,2.6vw,24px);line-height:1.42;margin:0 0 20px;text-wrap:pretty}
+textarea{width:100%;min-height:150px;padding:14px 15px;border-radius:11px;border:1px solid var(--line);
+  background:var(--bg);color:var(--ink);font:inherit;font-size:16px;line-height:1.55;resize:vertical}
+textarea:focus{outline:none;border-color:var(--gold-dim);
+  box-shadow:0 0 0 3px color-mix(in srgb,var(--gold) 15%,transparent)}
+.row{display:flex;gap:10px;align-items:center;margin-top:16px;flex-wrap:wrap}
+.btn{padding:12px 20px;border-radius:10px;border:1px solid var(--line);background:var(--raise);
+  color:var(--ink);cursor:pointer;font:inherit;font-size:15px;
+  transition:transform .16s ease,border-color .2s ease,background .2s ease}
+.btn:hover{transform:translateY(-1px);border-color:var(--gold-dim)}
+.btn:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.btn.gold{background:linear-gradient(180deg,var(--gold-br),var(--gold));color:#20180a;
+  border-color:transparent;font-weight:600}
+.btn[disabled]{opacity:.5;cursor:not-allowed;transform:none}
+.spacer{flex:1}
+.choices{display:flex;flex-direction:column;gap:8px;margin:0 0 14px}
+.choice{text-align:left;padding:12px 14px;border-radius:10px;border:1px solid var(--line);
+  background:var(--bg);color:var(--ink);cursor:pointer;font:inherit;font-size:15px;
+  transition:border-color .18s ease,background .18s ease}
+.choice:hover{border-color:var(--gold-dim)}
+.choice[aria-pressed="true"]{border-color:var(--gold);background:color-mix(in srgb,var(--gold) 14%,transparent)}
+.note{font-size:13.5px;color:var(--mut);line-height:1.55;margin:0 0 14px}
+.hint{font-family:var(--mono);font-size:11px;color:var(--mut);letter-spacing:.04em}
+.msg{margin-top:14px;padding:11px 13px;border-radius:9px;font-size:13.5px;display:none}
+.msg.on{display:block}
+.msg.ok{background:color-mix(in srgb,var(--gold) 11%,transparent);border:1px solid var(--line);color:var(--ink-soft)}
+.msg.err{background:rgba(190,80,70,.12);border:1px solid rgba(190,80,70,.35);color:#e8b6b0}
+:root[data-theme="light"] .msg.err{color:#8c2f24}
+/* phase chips */
+.phases{display:flex;flex-wrap:wrap;gap:6px;margin:20px 0 0}
+.chip{font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;
+  padding:5px 9px;border-radius:999px;border:1px solid var(--line);color:var(--mut)}
+.chip.done{color:var(--gold);border-color:var(--gold-dim)}
+.chip.now{background:color-mix(in srgb,var(--gold) 15%,transparent);color:var(--ink);border-color:var(--gold)}
+/* dashboard */
+.grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));margin-top:22px}
+.tile{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px}
+.tile h3{margin:0 0 6px;font-size:15px}
+.tile p{margin:0;color:var(--mut);font-size:13.5px;line-height:1.55}
+.big{font-family:var(--mono);font-size:30px;color:var(--gold);letter-spacing:-.02em}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<div class="bar">
+  <div class="brand" aria-label="NIOBE"><span>N</span><span>I</span><span>O</span><span>B</span><span>E</span></div>
+  <div class="bar-r">
+    <span class="who" id="who"></span>
+    <button class="ghost" id="tt" aria-label="Toggle theme">☾</button>
+    <button class="ghost" id="out">Sign out</button>
+  </div>
+</div>
+<div class="rail"><i id="rail"></i></div>
+
+<main>
+  <!-- loading -->
+  <section id="load"><p class="meta">Working</p><p class="lede">Checking your session…</p></section>
+
+  <!-- welcome / start -->
+  <section id="intro" class="hidden">
+    <p class="meta">First, it learns you</p>
+    <h1>A few questions. One at a time.</h1>
+    <p class="lede">It starts with your birth data — date, place, and time — then moves to how you think, decide, and work. Answer honestly — vague answers make a vague
+      assistant. There's no timer, and you can stop and pick up whenever. Most people finish across a
+      few sittings.</p>
+    <div class="row"><button class="btn gold" id="begin">Begin</button>
+      <span class="hint" id="resumeHint"></span></div>
+    <div class="phases" id="phaseChips"></div>
+  </section>
+
+  <!-- question -->
+  <section id="ask" class="hidden">
+    <p class="meta" id="phaseLabel"></p>
+    <div class="card">
+      <p class="q" id="qText"></p>
+      <div class="choices hidden" id="choices"></div>
+      <textarea id="ans" placeholder="Take your time. Specifics beat adjectives."
+                aria-label="Your answer"></textarea>
+      <div class="row">
+        <button class="btn" id="back">Back</button>
+        <span class="spacer"></span>
+        <span class="hint" id="counter"></span>
+        <button class="btn gold" id="next">Save &amp; continue</button>
+      </div>
+      <div class="msg" id="qmsg" role="status" aria-live="polite"></div>
+    </div>
+    <div class="phases" id="chips2"></div>
+  </section>
+
+  <!-- done -->
+  <section id="done" class="hidden">
+    <p class="meta">Complete</p>
+    <h1>Niobe knows you now.</h1>
+    <p class="lede">All 84 answered. Everything it does from here runs through that.</p>
+    <div class="grid">
+      <div class="tile"><h3>Answers captured</h3><p class="big" id="cnt">0</p></div>
+      <div class="tile"><h3>Your brain</h3><p>Eight structured files, built from what you told it.</p></div>
+      <div class="tile"><h3>Next</h3><p>Your instance is being built. It's usually ready within 15 minutes.</p></div>
+    </div>
+    <div class="row" style="margin-top:22px">
+      <a class="btn gold" href="/chat" style="text-decoration:none">Open Niobe</a>
+      <button class="btn" id="review">Review my answers</button>
+    </div>
+  </section>
+</main>
+
+<script src="/questions.js"></script>
+<script>
+const SUPA="https://gcryyyfepikdkjkgshcl.supabase.co";
+const KEY="sb_publishable_iasBF-GV38T2STJJYiwAVg_ia8EMRMr";
+const $=id=>document.getElementById(id);
+const show=id=>{['load','intro','ask','done'].forEach(s=>$(s).classList.toggle('hidden',s!==id))};
+
+/* theme */
+const root=document.documentElement;
+let sv=null; try{sv=localStorage.getItem('niobe-theme')}catch(e){}
+if(sv)root.setAttribute('data-theme',sv);
+const icon=()=>{const d=root.getAttribute('data-theme')||(matchMedia('(prefers-color-scheme:light)').matches?'light':'dark');$('tt').textContent=d==='light'?'☀':'☾'};
+icon();
+$('tt').onclick=()=>{const c=root.getAttribute('data-theme')||(matchMedia('(prefers-color-scheme:light)').matches?'light':'dark');
+  const n=c==='light'?'dark':'light';root.setAttribute('data-theme',n);try{localStorage.setItem('niobe-theme',n)}catch(e){}icon()};
+
+/* ---- session ---- */
+let TOKEN=null, USER=null, STATE={i:0,answers:{}};
+
+function captureHashToken(){
+  const h=new URLSearchParams(location.hash.slice(1));
+  const at=h.get('access_token');
+  if(at){ try{localStorage.setItem('niobe-token',at)}catch(e){}
+    history.replaceState(null,'',location.pathname); return at; }
+  try{return localStorage.getItem('niobe-token')}catch(e){return null}
+}
+async function getUser(tok){
+  const r=await fetch(`${SUPA}/auth/v1/user`,{headers:{apikey:KEY,Authorization:'Bearer '+tok}});
+  if(!r.ok) return null; return r.json();
+}
+async function saveMeta(data){
+  const r=await fetch(`${SUPA}/auth/v1/user`,{method:'PUT',
+    headers:{'Content-Type':'application/json',apikey:KEY,Authorization:'Bearer '+TOKEN},
+    body:JSON.stringify({data})});
+  if(!r.ok) throw new Error('save failed '+r.status);
+  return r.json();
+}
+
+/* ---- phases ---- */
+const PHASES=[...new Set(QUESTIONS.map(q=>q.p))];
+function phaseIdxOf(i){return PHASES.indexOf(QUESTIONS[i].p)}
+function renderChips(el){
+  const cur=STATE.i<QUESTIONS.length?phaseIdxOf(STATE.i):PHASES.length;
+  el.innerHTML=PHASES.map((p,n)=>{
+    const cls=n<cur?'chip done':(n===cur?'chip now':'chip');
+    return `<span class="${cls}">${p.split('—')[0].trim()}</span>`;
+  }).join('');
+}
+function railTo(){
+  const vis=QUESTIONS.map((_,n)=>visible(n));
+  const t=vis.filter(Boolean).length||1;
+  const d=vis.slice(0,STATE.i).filter(Boolean).length;
+  $('rail').style.width=(d/t*100).toFixed(2)+'%';
+}
+
+/* ---- flow ---- */
+function timeKnown(){
+  const bk=QUESTIONS.findIndex(x=>x.id==='b_known');
+  const a=(STATE.answers[bk]||'').toLowerCase();
+  if(!a) return null;
+  return a.startsWith("no") ? false : true;      // "No — I don't know it" => unknown
+}
+function visible(i){
+  const q=QUESTIONS[i]; if(!q||!q.cond) return true;
+  const k=timeKnown();
+  if(k===null) return true;                       // not answered yet: don't skip
+  return q.cond==='known' ? k===true : k===false;
+}
+function step(from,dir){
+  let i=from+dir;
+  while(i>=0 && i<QUESTIONS.length && !visible(i)) i+=dir;
+  return i;
+}
+function renderQ(){
+  while(STATE.i<QUESTIONS.length && !visible(STATE.i)) STATE.i++;
+  if(STATE.i>=QUESTIONS.length){ finish(); return }
+  const q=QUESTIONS[STATE.i];
+  const ch=$('choices'); ch.innerHTML=''; ch.classList.add('hidden');
+  if(q.choices){
+    ch.classList.remove('hidden');
+    q.choices.forEach(c=>{
+      const b=document.createElement('button');
+      b.type='button'; b.className='choice'; b.textContent=c;
+      b.setAttribute('aria-pressed', String((STATE.answers[STATE.i]||'')===c));
+      b.onclick=()=>{ $('ans').value=c;
+        [...ch.children].forEach(x=>x.setAttribute('aria-pressed','false'));
+        b.setAttribute('aria-pressed','true'); };
+      ch.appendChild(b);
+    });
+  }
+  $('phaseLabel').textContent='Phase '+q.p;
+  $('qText').textContent=`${STATE.i+1}. ${q.q}`;
+  $('ans').value=STATE.answers[STATE.i]||'';
+  const vis=QUESTIONS.map((_,n)=>visible(n));
+  const totalVis=vis.filter(Boolean).length;
+  const doneVis=vis.slice(0,STATE.i).filter(Boolean).length;
+  $('counter').textContent=`${doneVis+1} of ${totalVis}`;
+  $('back').disabled=STATE.i===0;
+  $('qmsg').className='msg';
+  renderChips($('chips2')); railTo();
+  show('ask'); $('ans').focus();
+}
+function finish(){ $('cnt').textContent=Object.keys(STATE.answers).length; railTo(); show('done') }
+
+$('begin').onclick=()=>renderQ();
+$('back').onclick=()=>{ const p=step(STATE.i,-1); if(p>=0){STATE.i=p;renderQ()} };
+$('next').onclick=async()=>{
+  const v=$('ans').value.trim();
+  if(!v){ $('qmsg').className='msg on err'; $('qmsg').textContent='Write something first — even a short answer helps.'; return }
+  STATE.answers[STATE.i]=v; STATE.i++;
+  $('next').disabled=true; $('next').textContent='Saving…';
+  try{ await saveMeta({onboarding:STATE}); }
+  catch(e){ $('qmsg').className='msg on err'; $('qmsg').textContent='Could not save. Your answer is kept locally — check your connection.'; }
+  $('next').disabled=false; $('next').textContent='Save & continue';
+  renderQ();
+};
+$('review').onclick=()=>{ STATE.i=0; renderQ() };
+$('out').onclick=()=>{ try{localStorage.removeItem('niobe-token')}catch(e){}; location.href='/login' };
+
+/* ---- boot ---- */
+(async function(){
+  TOKEN=captureHashToken();
+  if(!TOKEN){ location.href='/login'; return }
+  USER=await getUser(TOKEN);
+  if(!USER){ try{localStorage.removeItem('niobe-token')}catch(e){}; location.href='/login'; return }
+  $('who').textContent=USER.email||'';
+  const meta=(USER.user_metadata||{}).onboarding;
+  if(meta&&typeof meta.i==='number'){ STATE={i:meta.i,answers:meta.answers||{}} }
+  renderChips($('phaseChips')); railTo();
+  if(STATE.i>=QUESTIONS.length){ finish(); return }
+  if(STATE.i>0){
+    $('resumeHint').textContent=`Resuming at question ${STATE.i+1}.`;
+    $('begin').textContent='Resume';
+  }
+  show('intro');
+})();
+</script>
+</body>
+</html>
