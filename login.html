@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sign in — NIOBE</title>
+<meta name="description" content="Sign in to Niobe — a private intelligence.">
+<style>
+:root{
+  --bg:#111319; --surface:#1b1f28; --raise:#2a2f3b;
+  --gold:#EBC77C; --gold-br:#FBE3A8; --gold-dim:#b08e4e;
+  --ice:#BCD3E4; --ink:#F8F4EC; --ink-soft:#DDD5C4; --mut:#ABA593;
+  --line:rgba(216,184,120,.16); --radius:14px;
+  --serif:'Iowan Old Style','Palatino Linotype',Georgia,'Times New Roman',serif;
+  --mono:ui-monospace,'SF Mono','IBM Plex Mono',Menlo,Consolas,monospace;
+}
+:root[data-theme="light"]{
+  --bg:#f4f1e8; --surface:#fffdf7; --raise:#fbf7ec;
+  --gold:#9a7327; --gold-br:#7c5c1c; --gold-dim:#b79b63;
+  --ice:#41627e; --ink:#1d1a14; --ink-soft:#3b352a; --mut:#6b6152;
+  --line:rgba(120,95,40,.2);
+}
+@media(prefers-color-scheme:light){
+  :root:not([data-theme="dark"]){
+    --bg:#f4f1e8; --surface:#fffdf7; --raise:#fbf7ec;
+    --gold:#9a7327; --gold-br:#7c5c1c; --gold-dim:#b79b63;
+    --ice:#41627e; --ink:#1d1a14; --ink-soft:#3b352a; --mut:#6b6152;
+    --line:rgba(120,95,40,.2);
+  }
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:var(--serif); -webkit-font-smoothing:antialiased;
+  display:grid; place-items:center; padding:24px; position:relative; overflow-x:hidden;
+}
+#bg{position:fixed;inset:0;z-index:0;opacity:.5;pointer-events:none}
+.card{
+  position:relative; z-index:1; width:100%; max-width:410px;
+  background:linear-gradient(180deg,var(--surface),color-mix(in srgb,var(--surface) 88%, var(--bg)));
+  border:1px solid var(--line); border-radius:var(--radius);
+  padding:38px 34px 30px; box-shadow:0 30px 70px -30px rgba(0,0,0,.65);
+}
+.mark{display:flex;justify-content:center;gap:.14em;margin-bottom:6px}
+.mark span{
+  font-size:27px;letter-spacing:.16em;font-weight:600;color:var(--gold);
+  animation:rise .7s cubic-bezier(.2,.7,.2,1) both;
+}
+.mark span:nth-child(1){animation-delay:.05s}
+.mark span:nth-child(2){animation-delay:.13s}
+.mark span:nth-child(3){animation-delay:.21s}
+.mark span:nth-child(4){animation-delay:.29s}
+.mark span:nth-child(5){animation-delay:.37s}
+@keyframes rise{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:none}}
+.sub{
+  text-align:center;color:var(--mut);font-family:var(--mono);
+  font-size:11px;letter-spacing:.19em;text-transform:uppercase;margin:0 0 26px;
+}
+.lede{text-align:center;color:var(--ink-soft);font-size:16px;line-height:1.5;margin:0 0 24px}
+button,input{font:inherit}
+.btn{
+  width:100%;display:flex;align-items:center;justify-content:center;gap:10px;
+  padding:13px 16px;border-radius:10px;border:1px solid var(--line);
+  background:var(--raise);color:var(--ink);cursor:pointer;font-size:15px;
+  transition:transform .16s ease,border-color .2s ease,background .2s ease;
+}
+.btn:hover{transform:translateY(-1px);border-color:var(--gold-dim);background:color-mix(in srgb,var(--raise) 84%, var(--gold) 16%)}
+.btn:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.btn.gold{background:linear-gradient(180deg,var(--gold-br),var(--gold));color:#20180a;border-color:transparent;font-weight:600}
+.btn[disabled]{opacity:.55;cursor:not-allowed;transform:none}
+.or{display:flex;align-items:center;gap:12px;margin:20px 0;color:var(--mut);font-family:var(--mono);font-size:10px;letter-spacing:.2em}
+.or::before,.or::after{content:"";flex:1;height:1px;background:var(--line)}
+label{display:block;font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--mut);margin:0 0 7px}
+input[type=email]{
+  width:100%;padding:12px 14px;border-radius:10px;border:1px solid var(--line);
+  background:var(--bg);color:var(--ink);margin-bottom:12px;
+}
+input[type=email]:focus{outline:none;border-color:var(--gold-dim);box-shadow:0 0 0 3px color-mix(in srgb,var(--gold) 16%, transparent)}
+.msg{margin-top:16px;padding:11px 13px;border-radius:9px;font-size:13.5px;line-height:1.45;display:none}
+.msg.on{display:block}
+.msg.ok{background:color-mix(in srgb,var(--gold) 12%, transparent);border:1px solid var(--line);color:var(--ink-soft)}
+.msg.err{background:rgba(190,80,70,.12);border:1px solid rgba(190,80,70,.35);color:#e8b6b0}
+:root[data-theme="light"] .msg.err{color:#8c2f24}
+.foot{margin-top:24px;text-align:center;color:var(--mut);font-size:12px;line-height:1.6}
+.foot a{color:var(--gold);text-decoration:none}
+.foot a:hover{text-decoration:underline}
+.theme{position:fixed;top:16px;right:18px;z-index:2;background:none;border:1px solid var(--line);color:var(--mut);border-radius:8px;padding:6px 9px;cursor:pointer}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<canvas id="bg"></canvas>
+<button class="theme" id="tt" aria-label="Toggle theme">☾</button>
+
+<main class="card">
+  <div class="mark" aria-label="NIOBE"><span>N</span><span>I</span><span>O</span><span>B</span><span>E</span></div>
+  <p class="sub">A private intelligence</p>
+  <p class="lede">It learns how you think, then works for you.</p>
+
+  <button class="btn" id="gh">
+    <svg width="18" height="18" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+    Continue with GitHub
+  </button>
+
+  <div class="or">OR</div>
+
+  <form id="ef" novalidate>
+    <label for="em">Email</label>
+    <input id="em" type="email" autocomplete="email" placeholder="you@domain.com" required>
+    <button class="btn gold" type="submit" id="eb">Send sign-in link</button>
+  </form>
+
+  <div class="msg" id="msg" role="status" aria-live="polite"></div>
+
+  <p class="foot">
+    Your data stays yours. Nothing is trained on, nothing is shared.<br>
+    <a href="/">Back to niobe</a>
+  </p>
+</main>
+
+<script>
+const SUPA_URL = "https://gcryyyfepikdkjkgshcl.supabase.co";
+const SUPA_KEY = "sb_publishable_iasBF-GV38T2STJJYiwAVg_ia8EMRMr";
+const REDIRECT = location.origin + "/";
+
+/* theme */
+const root=document.documentElement, tt=document.getElementById('tt');
+let sv=null; try{sv=localStorage.getItem('niobe-theme')}catch(e){}
+if(sv) root.setAttribute('data-theme',sv);
+const syncIcon=()=>{const d=root.getAttribute('data-theme')||(matchMedia('(prefers-color-scheme:light)').matches?'light':'dark');tt.textContent=d==='light'?'☀':'☾'};
+syncIcon();
+tt.onclick=()=>{const cur=root.getAttribute('data-theme')||(matchMedia('(prefers-color-scheme:light)').matches?'light':'dark');const nx=cur==='light'?'dark':'light';root.setAttribute('data-theme',nx);try{localStorage.setItem('niobe-theme',nx)}catch(e){}syncIcon()};
+
+/* message helper */
+const msg=document.getElementById('msg');
+function say(text,kind){msg.textContent=text;msg.className='msg on '+(kind||'ok')}
+
+/* GitHub OAuth */
+document.getElementById('gh').onclick=()=>{
+  const u=`${SUPA_URL}/auth/v1/authorize?provider=github&redirect_to=${encodeURIComponent(REDIRECT)}`;
+  location.href=u;
+};
+
+/* Email magic link */
+const ef=document.getElementById('ef'), eb=document.getElementById('eb');
+ef.onsubmit=async(e)=>{
+  e.preventDefault();
+  const email=document.getElementById('em').value.trim();
+  if(!email||!email.includes('@')){say('Enter a valid email address.','err');return}
+  eb.disabled=true; eb.textContent='Sending…';
+  try{
+    const r=await fetch(`${SUPA_URL}/auth/v1/magiclink`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json','apikey':SUPA_KEY},
+      body:JSON.stringify({email,create_user:true,gotrue_meta_security:{},redirect_to:REDIRECT})
+    });
+    if(r.ok){say('Check your email. The link signs you in — it expires in an hour.','ok');ef.reset()}
+    else{const t=await r.text();say('That failed. '+(t.slice(0,120)||'Try again in a moment.'),'err')}
+  }catch(err){say('Network error. Nothing was sent.','err')}
+  eb.disabled=false; eb.textContent='Send sign-in link';
+};
+
+/* already signed in? */
+(function(){
+  const h=new URLSearchParams(location.hash.slice(1));
+  if(h.get('access_token')) say('Signed in. Redirecting…','ok'), setTimeout(()=>location.href='/',900);
+  const err=h.get('error_description'); if(err) say(decodeURIComponent(err).slice(0,160),'err');
+})();
+
+/* ambient node-network background (matches landing page language) */
+(function(){
+  const c=document.getElementById('bg'),x=c.getContext('2d');let w,hh,pts=[],raf;
+  const reduce=matchMedia('(prefers-reduced-motion:reduce)').matches;
+  function size(){w=c.width=innerWidth;hh=c.height=innerHeight;
+    const n=Math.min(46,Math.round(w*hh/26000));
+    pts=Array.from({length:n},()=>({x:Math.random()*w,y:Math.random()*hh,vx:(Math.random()-.5)*.22,vy:(Math.random()-.5)*.22}));}
+  function gold(){return getComputedStyle(root).getPropertyValue('--gold').trim()||'#EBC77C'}
+  function draw(){
+    x.clearRect(0,0,w,hh);const g=gold();
+    for(let i=0;i<pts.length;i++){const p=pts[i];
+      if(!reduce){p.x+=p.vx;p.y+=p.vy}
+      if(p.x<0||p.x>w)p.vx*=-1; if(p.y<0||p.y>hh)p.vy*=-1;
+      for(let j=i+1;j<pts.length;j++){const q=pts[j],dx=p.x-q.x,dy=p.y-q.y,d=Math.hypot(dx,dy);
+        if(d<136){x.globalAlpha=(1-d/136)*.19;x.strokeStyle=g;x.lineWidth=1;
+          x.beginPath();x.moveTo(p.x,p.y);x.lineTo(q.x,q.y);x.stroke()}}
+      x.globalAlpha=.5;x.fillStyle=g;x.beginPath();x.arc(p.x,p.y,1.3,0,6.283);x.fill();}
+    x.globalAlpha=1;raf=requestAnimationFrame(draw);
+  }
+  addEventListener('resize',size);size();draw();
+})();
+</script>
+</body>
+</html>
